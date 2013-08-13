@@ -1,6 +1,8 @@
 import urllib2
 import json
 import logging
+import os
+import zipfile
 
 class BetaSeries():
 
@@ -58,6 +60,8 @@ class BetaSeries():
 		except Exception as err:
 			logging.error('Error : ' + str(err))
 
+	# Get a list of subtitle		
+	# Need url show, season,nb_numero and language
 	def getSubtitle(self,show_url,season,nb_episode,language):
 		url = 'http://api.betaseries.com/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(nb_episode)
 		response = urllib2.urlopen(url)
@@ -79,15 +83,23 @@ class BetaSeries():
 		except Exception as err:
 			logging.error('Error : ' + str(err))
 
+	# Dowload a subtitle and extract it in a folder
+	# Need a subtitle_object
+	def dowloadSubtitle(self,subtitle_object):
+		url = subtitle_object['url']
+		name = subtitle_object['file']
+
+		if self._verbose:
+			print("downloading " + str(url))
+
+		f = urllib2.urlopen(url)
+		# Open our local file for writing
+		with open(os.path.basename(name), "wb") as local_file:
+			local_file.write(f.read())
+
+		# Create a ZipFile object
+		# Only 1 file per Zip
+		zf = zipfile.ZipFile(name)
+		zf.extract(zf.namelist()[0])
 
 
-
-
-
-
-B = BetaSeries('245d8c3b4a91')
-B._verbose = True
-une_liste = B.search('dexter')
-dictio = B.getSerie(une_liste[1])
-dicot = B.getSubtitle('dexter',1,1,'VO')
-print(dicot['0'])
