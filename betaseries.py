@@ -45,6 +45,7 @@ class Show():
 	duration = property(_get_duration)
 	banner = property(_get_banner)
 
+
 # Class Subtitle
 # Using to create subtitle object
 # Allow to download the subtitle and get informations
@@ -56,7 +57,8 @@ class Subtitle():
 	def _get_name(self):
 		return self._subtitle['file']
 
-	def download(self):
+	def download(self,path=None):
+		
 		url = self._subtitle['url']
 		name = self._subtitle['file']
 		try:
@@ -70,7 +72,12 @@ class Subtitle():
 			# Create a ZipFile object
 			# Only 1 file per Zip
 			zf = zipfile.ZipFile(name)
-			zf.extract(zf.namelist()[0])
+			zf.extract(zf.namelist()[0],path)
+
+			# Delete the zip file after that
+			os.remove(name)
+
+			return zf.namelist()[0]
 		except Exception as err:
 			logging.error('Error during opening archive :' + str(err))
 
@@ -113,7 +120,7 @@ class BetaSeries():
 			logging.error('Error : ' + str(err))
 
 	# Get Data from a Serie using url name
-	# Return a dictionnary with multiple information
+	# Return a Show object
 	def getShow(self,show_url):
 		url = 'http://api.betaseries.com/shows/display/' + str(show_url) + '.json?key=' + str(self._key)
 		response = urllib2.urlopen(url)
@@ -154,6 +161,3 @@ class BetaSeries():
 
 		except Exception as err:
 			logging.error('Error : ' + str(err))
-
-
-
