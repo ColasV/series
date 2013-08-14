@@ -5,9 +5,9 @@ import json
 import logging
 import os
 import zipfile
+import string
 
 # Utilities function
-
 def convert(input):
     if isinstance(input, dict):
         return {convert(key): convert(value) for key, value in input.iteritems()}
@@ -58,7 +58,6 @@ class Subtitle():
 		return self._subtitle['file']
 
 	def download(self,path=None):
-		
 		url = self._subtitle['url']
 		name = self._subtitle['file']
 		try:
@@ -77,6 +76,7 @@ class Subtitle():
 			# Delete the zip file after that
 			os.remove(name)
 
+			# return the file nane
 			return zf.namelist()[0]
 		except Exception as err:
 			logging.error('Error during opening archive :' + str(err))
@@ -97,7 +97,7 @@ class BetaSeries():
 
 
 	# Search in BeataSeries database with the keyword
-	# Return a list with the list of shows
+	# Return a list with a list of shows
 	def search(self,keyword):
 		url = 'http://api.betaseries.com/shows/search.json?title=' + str(keyword) + '&key=' + str(self._key)
 		response = urllib2.urlopen(url)
@@ -108,7 +108,7 @@ class BetaSeries():
 
 		try:
 			for i in data['root']['shows']:
-				shows.append(data['root']['shows'][i]['url'])
+				shows.append(data['root']['shows'][i])
 
 			if self._verbose:
 				for show in shows:
@@ -118,6 +118,26 @@ class BetaSeries():
 
 		except Exception as err:
 			logging.error('Error : ' + str(err))
+
+	# Search a specific keyword in the database
+	# Case_sensitive allow you to be more specific
+	def searchSpecific(self,keyword,case_sensitive=False):
+		out = self.search(keyword)
+
+		if not case_sensitive:
+			keyword = string.lower(keyword)
+
+
+		for i in out:
+			title = i['title']
+			if not case_sensitive:
+				title = string.lower(title)
+
+			if  title == keyword:
+				return i
+
+		return None
+
 
 	# Get Data from a Serie using url name
 	# Return a Show object
@@ -139,7 +159,7 @@ class BetaSeries():
 		except Exception as err:
 			logging.error('Error : ' + str(err))
 
-	# Get a dictionnaries of subtitle		
+	# Get a list of subtitle object	
 	# Need url show, season,nb_numero and language
 	def getSubtitle(self,show_url,season,nb_episode,language='VO'):
 		url = 'http://api.betaseries.com/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(nb_episode)
@@ -147,11 +167,11 @@ class BetaSeries():
 		html = response.read()
 		data = json.loads(html)
 
-		subtitles = {}
+		subtitles = []
 
 		try:
 			for i in data['root']['subtitles']:
-				subtitles[i] = Subtitle(data['root']['subtitles'][i])
+				subtitles.append(Subtitle(data['root']['subtitles'][i]))
 
 			if self._verbose:
 				for info in subtitles:
