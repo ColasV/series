@@ -96,17 +96,35 @@ class BetaSeries():
 		self._verbose = False
 
 
+	# Decode a JSON url
+	# Check if no error are raised by the API
+	def _decodeJson(self,url):
+		try:
+			response = urllib2.urlopen(url)
+			html = response.read()
+			data = json.loads(html)
+		except Exception as err:
+			logging.error('Error during parsing : ' + str(err))
+		
+		if 'code' in data['root']:
+			if data['root']['code'] != 1:
+				raise Exception('Error with the API, code : ' + str(data['root']['code']))	
+
+
+		return data
+
+
 	# Search in BeataSeries database with the keyword
 	# Return a list with a list of shows
 	def search(self,keyword):
-		url = 'http://api.betaseries.com/shows/search.json?title=' + str(keyword) + '&key=' + str(self._key)
-		response = urllib2.urlopen(url)
-		html = response.read()
-		data = json.loads(html)
-
-		shows = []
-
+		keyword = keyword.split(" ")
+		keyword = "_".join(keyword)
 		try:
+			url = 'http://api.betaseries.com/shows/search.json?title=' + str(keyword) + '&key=' + str(self._key)
+			data = self._decodeJson(url)
+		
+			shows = []
+		
 			for i in data['root']['shows']:
 				shows.append(data['root']['shows'][i])
 
@@ -142,13 +160,10 @@ class BetaSeries():
 	# Get Data from a Serie using url name
 	# Return a Show object
 	def getShow(self,show_url):
-		url = 'http://api.betaseries.com/shows/display/' + str(show_url) + '.json?key=' + str(self._key)
-		response = urllib2.urlopen(url)
-		html = response.read()
-		html = html
-		data = json.loads(html)
-
 		try:
+			url = 'http://api.betaseries.com/shows/display/' + str(show_url) + '.json?key=' + str(self._key)
+			data = self._decodeJson(url)
+
 			show = Show(data['root']['show'])
 
 			if self._verbose:
@@ -162,14 +177,12 @@ class BetaSeries():
 	# Get a list of subtitle object	
 	# Need url show, season,nb_numero and language
 	def getSubtitle(self,show_url,season,nb_episode,language='VO'):
-		url = 'http://api.betaseries.com/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(nb_episode)
-		response = urllib2.urlopen(url)
-		html = response.read()
-		data = json.loads(html)
-
-		subtitles = []
-
 		try:
+			url = 'http://api.betaseries.com/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(nb_episode)
+			data = self._decodeJson(url)
+
+			subtitles = []
+
 			for i in data['root']['subtitles']:
 				subtitles.append(Subtitle(data['root']['subtitles'][i]))
 
