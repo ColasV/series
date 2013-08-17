@@ -8,6 +8,8 @@ import zipfile
 import string
 import collections
 
+from datetime import date
+
 BS_URL = 'http://api.betaseries.com'
 SUB_EN = 'VO'
 SUB_FR = 'VF'
@@ -24,6 +26,34 @@ def convert(input):
     else:
         return input
 
+# Class Episode
+# Object is using by the BS class
+# Contain all the informations about 1 episode
+class Episode():
+
+	def __init__(self,episode_info):
+		self._episode_info = episode_info
+	
+	def _get_title(self):
+		return self._episode_info['title']
+
+	def _get_date(self):
+		date_object = date.fromtimestamp(self._episode_info['date'])
+		return date_object.strftime("%A %d. %B %Y")
+
+	def _get_description(self):
+		return convert(self._episode_info['description'])
+
+	def __str__(self):
+		content = 'Title : ' + self.title + '\n'
+		content += 'Date : ' + self.date + '\n'
+		content += 'Description : ' + self.description
+
+		return content 
+
+	description = property(_get_description)
+	title = property(_get_title)
+	date = property(_get_date)
 
 # Class Show
 # Object is using by the BetaSeries class
@@ -44,6 +74,12 @@ class Show():
 
 	def _get_banner(self):
 		return self._show_info['banner']
+
+	def __str__(self):
+		content = 'Title : ' + self.title + '\n'
+		content += 'Description : ' + self.description
+
+		return content 
 
 
 	description = property(_get_description)
@@ -183,10 +219,10 @@ class BetaSeries():
 	# Get a list of subtitle object	
 	# Need url show, season,nb_numero and language
 	# Language = (SUB_FR|SUB_EN)
-	def get_subtitle(self,show_url,season,nb_episode,language=SUB_EN):
+	def get_subtitle(self,show_url,season,episode,language=SUB_EN):
 		try:
 
-			url = BS_URL + '/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(nb_episode)
+			url = BS_URL + '/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(episode)
 			data = self._decode_json(url)
 
 			subtitles = []
@@ -199,6 +235,22 @@ class BetaSeries():
 					print(info)
 
 			return subtitles
+
+		except Exception as err:
+			logging.error('Error : ' + str(err))
+
+
+	# Get informations about 1 episode
+	# Need show_url, season number and episode number
+	# return an Episode object
+	def get_episode(self,show_url,season,episode):
+		try:
+			url = BS_URL + '/shows/episodes/' + str(show_url) + '.json?key=' + str(self._key) + '&season=' + str(season) + '&episode=' + str(episode)
+			data = self._decode_json(url)
+
+			episode = Episode(data['root']['seasons']['0']['episodes']['0'])
+
+			return episode
 
 		except Exception as err:
 			logging.error('Error : ' + str(err))

@@ -17,15 +17,15 @@ for i in listF:
 	new_p = new_dir + i
 	
 	if not os.path.isfile(new_p):
-		answer = B.searchSpecific(i)
+		answer = B.search(i)
 		
 		if answer != None:
 			# Print debug 
-			print(answer['title'])
+			print(answer.title)
 
 			# Write in html file
-			F.write('<h1>' + str(answer['title']) + '</h1>')
-			val = B.getShow(answer['url'])
+			F.write('<h1>' + str(answer.title) + '</h1>')
+			val = B.get_show(answer.url)
 			F.write('<p>' + str(val.description) + '</p>')
 			F.write('<img src="' + str(val.banner) + '" />')
 

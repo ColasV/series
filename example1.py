@@ -36,3 +36,9 @@ result_subtitle = B.get_subtitle(result_specific.url,1,1,SUB_FR)
 # Download and unzip in your script folder
 print ('Downloading : ' + result_subtitle[0].name)
 result_subtitle[0].download()
+
+# Get information about one episode
+# Return an episode object
+# Implement a str method
+result_episode = B.get_episode('dexter',8,2)
+print(result_episode)
