@@ -9,7 +9,7 @@ B = BetaSeries('245d8c3b4a91')
 
 # Search for a serie in the database:
 # Look at all the shows with the keyword
-result = B.search('NCIS')
+result = B.search_keyword('NCIS')
 for i in result:
 	print(i['title'])
 
@@ -17,19 +17,19 @@ print("\n")
 
 # Specific search:
 # return a dictionnary with two element url and title
-result_specific = B.searchSpecific('NCIS')
-print(result_specific['title'])
+result_specific = B.search('NCIS')
+print(result_specific.title)
 
 # Get a show informations
 # Need a show url
 # Return a Show object
-result_show = B.getShow(result_specific['url'])
+result_show = B.get_show(result_specific.url)
 print('Title : ' + result_show.title + "\n")
 print('Description : ' + result_show.description)
 
 # Download a subtitle
 # Need the url show, season number, episode number and optionnal (VO|VF)
-result_subtitle = B.getSubtitle(result_specific['url'],1,1,'VO')
+result_subtitle = B.get_subtitle(result_specific.url,1,1,SUB_FR)
 
 # Get a list of Subtitle object
 # Try to download the first one

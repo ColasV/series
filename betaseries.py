@@ -6,6 +6,12 @@ import logging
 import os
 import zipfile
 import string
+import collections
+
+BS_URL = 'http://api.betaseries.com'
+SUB_EN = 'VO'
+SUB_FR = 'VF'
+
 
 # Utilities function
 def convert(input):
@@ -85,7 +91,6 @@ class Subtitle():
 	name = property(_get_name)
 
 
-
 class BetaSeries():
 
 	# Init your Class 
@@ -98,7 +103,7 @@ class BetaSeries():
 
 	# Decode a JSON url
 	# Check if no error are raised by the API
-	def _decodeJson(self,url):
+	def _decode_json(self,url):
 		try:
 			response = urllib2.urlopen(url)
 			html = response.read()
@@ -116,12 +121,12 @@ class BetaSeries():
 
 	# Search in BeataSeries database with the keyword
 	# Return a list with a list of shows
-	def search(self,keyword):
+	def search_keyword(self,keyword):
 		keyword = keyword.split(" ")
 		keyword = "_".join(keyword)
 		try:
-			url = 'http://api.betaseries.com/shows/search.json?title=' + str(keyword) + '&key=' + str(self._key)
-			data = self._decodeJson(url)
+			url = BS_URL + '/shows/search.json?title=' + str(keyword) + '&key=' + str(self._key)
+			data = self._decode_json(url)
 		
 			shows = []
 		
@@ -139,12 +144,13 @@ class BetaSeries():
 
 	# Search a specific keyword in the database
 	# Case_sensitive allow you to be more specific
-	def searchSpecific(self,keyword,case_sensitive=False):
-		out = self.search(keyword)
+	def search(self,keyword,case_sensitive=False):
+		show_result = collections.namedtuple('show_result', ['url', 'title'])
+
+		out = self.search_keyword(keyword)
 
 		if not case_sensitive:
 			keyword = string.lower(keyword)
-
 
 		for i in out:
 			title = i['title']
@@ -152,17 +158,17 @@ class BetaSeries():
 				title = string.lower(title)
 
 			if  title == keyword:
-				return i
+				return show_result(i['url'],i['title'])
 
 		return None
 
 
 	# Get Data from a Serie using url name
 	# Return a Show object
-	def getShow(self,show_url):
+	def get_show(self,show_url):
 		try:
-			url = 'http://api.betaseries.com/shows/display/' + str(show_url) + '.json?key=' + str(self._key)
-			data = self._decodeJson(url)
+			url = BS_URL + '/shows/display/' + str(show_url) + '.json?key=' + str(self._key)
+			data = self._decode_json(url)
 
 			show = Show(data['root']['show'])
 
@@ -176,10 +182,12 @@ class BetaSeries():
 
 	# Get a list of subtitle object	
 	# Need url show, season,nb_numero and language
-	def getSubtitle(self,show_url,season,nb_episode,language='VO'):
+	# Language = (SUB_FR|SUB_EN)
+	def get_subtitle(self,show_url,season,nb_episode,language=SUB_EN):
 		try:
-			url = 'http://api.betaseries.com/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(nb_episode)
-			data = self._decodeJson(url)
+
+			url = BS_URL + '/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(nb_episode)
+			data = self._decode_json(url)
 
 			subtitles = []
 
