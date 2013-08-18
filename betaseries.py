@@ -10,6 +10,7 @@ import collections
 
 from datetime import date
 
+# Const
 BS_URL = 'http://api.betaseries.com'
 SUB_EN = 'VO'
 SUB_FR = 'VF'
@@ -17,14 +18,22 @@ SUB_FR = 'VF'
 
 # Utilities function
 def convert(input):
-    if isinstance(input, dict):
-        return {convert(key): convert(value) for key, value in input.iteritems()}
-    elif isinstance(input, list):
-        return [convert(element) for element in input]
-    elif isinstance(input, unicode):
-        return input.encode('utf-8')
-    else:
-        return input
+	"""
+	This simple function encode a string,dict or list with utf-8 and return a string
+
+	:param input: The input that you want to convert
+	:type input: str,dict,list.
+	:returns: str.
+
+	"""
+	if isinstance(input, dict):
+		return {convert(key): convert(value) for key, value in input.iteritems()}
+	elif isinstance(input, list):
+		return [convert(element) for element in input]
+	elif isinstance(input, unicode):
+		return input.encode('utf-8')
+	else:
+		return input
 
 # Class Episode
 # Object is using by the BS class
@@ -47,7 +56,6 @@ class Episode():
 	def __str__(self):
 		content = 'Title : ' + self.title + '\n'
 		content += 'Date : ' + self.date + '\n'
-		content += 'Description : ' + self.description
 
 		return content 
 
@@ -77,9 +85,9 @@ class Show():
 
 	def __str__(self):
 		content = 'Title : ' + self.title + '\n'
-		content += 'Description : ' + self.description
+		content += 'Duration : ' + self.duration
 
-		return content 
+		return convert(content) 
 
 
 	description = property(_get_description)
@@ -128,10 +136,24 @@ class Subtitle():
 
 
 class BetaSeries():
+	"""
 
-	# Init your Class 
-	# Need the key for the API
-	# Put the verbose mode on Off
+	Class BetaSeries : The main class of the library
+
+	BetaSeries Object allow you to interact with the BetaSeries API
+
+	Args:
+		key (str): Key API, you can get in one from http://www.betaseries.com
+
+
+	To create a new instance it's very easy:
+	
+	>>> import betaseries
+	>>> betaseries.BetaSeries('a23736dhbee')
+
+	"""
+
+
 	def __init__(self,key):
 		self._key = key
 		self._verbose = False
@@ -155,9 +177,24 @@ class BetaSeries():
 		return data
 
 
-	# Search in BeataSeries database with the keyword
-	# Return a list with a list of shows
 	def search_keyword(self,keyword):
+		"""
+
+		This function search a keyword in the BetaSeries database.
+
+		The function search all the occurence of the keyword in the database.
+
+		Args:
+			Keyword : A string keyword
+
+		Returns:
+			Return a list which contain all the occurence find in the database
+
+			Each element contain a dict element with two keys :
+				url : contain the url show 
+				title : title of the show
+
+		"""
 		keyword = keyword.split(" ")
 		keyword = "_".join(keyword)
 		try:
@@ -178,9 +215,30 @@ class BetaSeries():
 		except Exception as err:
 			logging.error('Error : ' + str(err))
 
-	# Search a specific keyword in the database
-	# Case_sensitive allow you to be more specific
+	
 	def search(self,keyword,case_sensitive=False):
+		"""
+
+		This function search a specific keyword in the BetaSeries database.
+
+		The function search the exact occurence in the database.
+
+		Args:
+			Keyword (str): A string keyword
+			case_sensitive: Allow you to search with or without case senstive 
+
+		Returns:
+			Return a namedtuple which contain two informations:
+				url : contain the url show 
+
+				title : title of the show
+
+			You can easily access to this two attributs:
+				response.url
+				response.url
+
+		"""
+
 		show_result = collections.namedtuple('show_result', ['url', 'title'])
 
 		out = self.search_keyword(keyword)
@@ -198,9 +256,6 @@ class BetaSeries():
 
 		return None
 
-
-	# Get Data from a Serie using url name
-	# Return a Show object
 	def get_show(self,show_url):
 		try:
 			url = BS_URL + '/shows/display/' + str(show_url) + '.json?key=' + str(self._key)

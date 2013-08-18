@@ -24,8 +24,9 @@ print(result_specific.title)
 # Need a show url
 # Return a Show object
 result_show = B.get_show(result_specific.url)
-print('Title : ' + result_show.title + "\n")
+print(result_show)
 print('Description : ' + result_show.description)
+
 
 # Download a subtitle
 # Need the url show, season number, episode number and optionnal (VO|VF)
@@ -40,5 +41,6 @@ result_subtitle[0].download()
 # Get information about one episode
 # Return an episode object
 # Implement a str method
-result_episode = B.get_episode('dexter',8,2)
+result_episode = B.get_episode('dexter',8,1)
 print(result_episode)
+print(result_episode.description)
