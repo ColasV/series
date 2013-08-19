@@ -1,5 +1,3 @@
-# Important stuff
-
 import urllib2
 import json
 import logging
@@ -21,9 +19,10 @@ def convert(input):
 	"""
 	This simple function encode a string,dict or list with utf-8 and return a string
 
-	:param input: The input that you want to convert
-	:type input: str,dict,list.
-	:returns: str.
+	Args:
+		input (dict|list|str): an input to convert
+	Returns:
+		(dict|list|str) return the converted object
 
 	"""
 	if isinstance(input, dict):
@@ -63,11 +62,21 @@ class Episode():
 	title = property(_get_title)
 	date = property(_get_date)
 
-# Class Show
-# Object is using by the BetaSeries class
 class Show():
-	# Init your object
-	# Need data from the show
+	"""
+
+	Class Show
+
+	Show object allow you to interact with show informations.
+
+	Args:
+		show_info (str): A valid show url string
+
+
+	.. note::
+		You are not suppose to create a Show object, the main class is supose to do that.
+
+	"""
 	def __init__(self,show_info):
 		self._show_info = show_info
 
@@ -158,9 +167,6 @@ class BetaSeries():
 		self._key = key
 		self._verbose = False
 
-
-	# Decode a JSON url
-	# Check if no error are raised by the API
 	def _decode_json(self,url):
 		try:
 			response = urllib2.urlopen(url)
@@ -229,9 +235,8 @@ class BetaSeries():
 
 		Returns:
 			Return a namedtuple which contain two informations:
-				url : contain the url show 
-
-				title : title of the show
+				url : contain the url show.
+				title : title of the show.
 
 			You can easily access to this two attributs:
 				response.url
@@ -257,6 +262,20 @@ class BetaSeries():
 		return None
 
 	def get_show(self,show_url):
+		"""
+
+		This function get show informations. Need a valid show url.
+
+		Args:
+			show_url (str): A valid show url string
+
+		Returns:
+			Return a Show object
+
+			You can easily access to these information by looking in the Show class
+
+		"""
+
 		try:
 			url = BS_URL + '/shows/display/' + str(show_url) + '.json?key=' + str(self._key)
 			data = self._decode_json(url)
@@ -271,10 +290,24 @@ class BetaSeries():
 		except Exception as err:
 			logging.error('Error : ' + str(err))
 
-	# Get a list of subtitle object	
-	# Need url show, season,nb_numero and language
-	# Language = (SUB_FR|SUB_EN)
+	
 	def get_subtitle(self,show_url,season,episode,language=SUB_EN):
+		"""
+
+		This function get a list of subtitle
+
+		Args:
+			show_url (str): A valid show url string.
+			season (int): season number.
+			episode (int): episode number.
+			language (str): (Optionnal default = SUB_EN) The type of subtitle english or french version
+
+		Returns:
+			Return a list of Subtitle object
+
+			You can easily access to these subtitles by looking in the Subtitle object
+
+		"""
 		try:
 
 			url = BS_URL + '/subtitles/show/' + str(show_url) + '.json?key=' + str(self._key) + '&language=' + str(language) + '&season=' + str(season) + '&episode=' + str(episode)
@@ -295,10 +328,22 @@ class BetaSeries():
 			logging.error('Error : ' + str(err))
 
 
-	# Get informations about 1 episode
-	# Need show_url, season number and episode number
-	# return an Episode object
 	def get_episode(self,show_url,season,episode):
+		"""
+
+		This function get episode informations.
+
+		Args:
+			show_url (str): A valid show url string.
+			season (int): A season number.
+			episode (int): An episode number
+
+		Returns:
+			Return an Episode object
+
+			You can easily access to these information by looking in the Episode class
+
+		"""
 		try:
 			url = BS_URL + '/shows/episodes/' + str(show_url) + '.json?key=' + str(self._key) + '&season=' + str(season) + '&episode=' + str(episode)
 			data = self._decode_json(url)
