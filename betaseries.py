@@ -126,6 +126,29 @@ class Subtitle():
 				local_file.write(f.read())
 		except Exception as err:
 			logging.error('Error during downloading :' + str(err))
+	
+	name = property(_get_name)
+
+# Class SubtitleZip
+# Sub-Class from Subtitle which is used for extracting zip or tar.gz
+class SubtitleZip(Subtitle):
+	"""
+
+	Class SubtitleZip : sub-class from Subtitle
+
+
+	"""
+
+	def download(self,path=None):
+		url = self._subtitle['url']
+		name = self._subtitle['file']
+		try:
+			f = urllib2.urlopen(url)
+			# Open our local file for writing
+			with open(os.path.basename(name), "wb") as local_file:
+				local_file.write(f.read())
+		except Exception as err:
+			logging.error('Error during downloading :' + str(err))
 		try:
 			# Create a ZipFile object
 			# Only 1 file per Zip
@@ -141,7 +164,6 @@ class Subtitle():
 			logging.error('Error during opening archive :' + str(err))
 
 
-	name = property(_get_name)
 
 
 class BetaSeries():
@@ -316,7 +338,13 @@ class BetaSeries():
 			subtitles = []
 
 			for i in data['root']['subtitles']:
-				subtitles.append(Subtitle(data['root']['subtitles'][i]))
+				extension = data['root']['subtitles'][i]['file'].split(".")
+				
+				# Check the differente extensio, can be zip file or srt file.
+				if (extension[-1] == 'zip'):
+					subtitles.append(SubtitleZip(data['root']['subtitles'][i]))
+				else:
+					subtitles.append(Subtitle(data['root']['subtitles'][i]))
 
 			if self._verbose:
 				for info in subtitles:
