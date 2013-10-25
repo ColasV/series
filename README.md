@@ -26,3 +26,7 @@ How to start
 'Dexter'
 >>> result.url
 'dexter'
+
+Next TO-DO
+===========
+- Gérer les différents cas d'archives

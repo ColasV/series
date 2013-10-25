@@ -64,7 +64,6 @@ class Episode():
 
 class Show():
 	"""
-
 	Class Show
 
 	Show object allow you to interact with show informations.
@@ -133,7 +132,6 @@ class Subtitle():
 # Sub-Class from Subtitle which is used for extracting zip or tar.gz
 class SubtitleZip(Subtitle):
 	"""
-
 	Class SubtitleZip : sub-class from Subtitle
 
 
@@ -162,6 +160,16 @@ class SubtitleZip(Subtitle):
 			return zf.namelist()[0]
 		except Exception as err:
 			logging.error('Error during opening archive :' + str(err))
+
+
+class SubtitleTar(Subtitle):
+	"""
+	Class SubtitleTar
+
+	"""
+
+	def download(self,path=None):
+		return None
 
 
 
