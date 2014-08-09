@@ -1,3 +1,6 @@
 *.pyc
 doc/*
 .idea
+*.zip
+*.tar
+*.srt
