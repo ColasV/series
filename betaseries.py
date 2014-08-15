@@ -40,6 +40,8 @@ def json_decode(url):
 def extension(filename):
     try:
         t = filename.split('.')
+        if len(t) == 1:
+            return None
         return t[-1]
     except Exception:
         return None
@@ -71,7 +73,7 @@ class BetaSeries(object):
 
     @staticmethod
     def _verify_connection(key):
-        url = 'https://api.betaseries.com/shows/display?id=1&key=' + key
+        url = 'https://api.betaseries.com/shows/display?id=1&key=' + str(key)
 
         return requests.get(url).status_code == 200
 
