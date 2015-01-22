@@ -5,8 +5,10 @@ class BetaSeriesError(Exception):
     def __str__(self):
         return self.msg
 
+
 class BetaSeriesAPIError(Exception):
     pass
+
 
 class ConnectionError(BetaSeriesError):
     pass

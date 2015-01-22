@@ -1,5 +1,4 @@
 __author__ = 'vignesn'
-__package__ = 'betaseries'
 
 # import
 import requests

@@ -1,10 +1,10 @@
-from unittest import TestCase
+import unittest
 from lib.betaseries import extension
 
 __author__ = 'vignesn'
 
 
-class TestExtension(TestCase):
+class TestExtension(unittest.TestCase):
     def test_extension_zip(self):
         filename = 'fichier.zip'
         self.assertEqual('zip', extension(filename))
@@ -24,3 +24,6 @@ class TestExtension(TestCase):
     def test_null_path(self):
         filename = ''
         self.assertEqual(None, extension(filename))
+
+if __name__ == '__main__':
+    unittest.main()
